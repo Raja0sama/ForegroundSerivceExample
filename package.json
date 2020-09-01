@@ -10,6 +10,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@supersami/react-native-foreground-service": "^0.1.0",
     "react": "16.11.0",
     "react-native": "0.62.0"
   },
@@ -19,7 +20,6 @@
     "@react-native-community/eslint-config": "^1.0.0",
     "babel-jest": "^25.2.4",
     "eslint": "^6.8.0",
-    "react-native-foreground-service": "github:cristianoccazinsp/react-native-foreground-service",
     "jest": "^25.2.4",
     "metro-react-native-babel-preset": "^0.59.0",
     "react-test-renderer": "16.11.0"

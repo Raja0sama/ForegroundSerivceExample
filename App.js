@@ -25,57 +25,60 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 import {DeviceEventEmitter} from 'react-native';
+// importing Service to call
+import ForegroundService from '@supersami/react-native-foreground-service';
 
-import ForegroundService from 'react-native-foreground-service';
-let obj = { routeName : "mainActivity", routeParams : {data:""} }
-let obj1  = { routeName : "mainActivity 1", routeParams : {data:""} }
+// on button click or click on the main activity you will going to receive this as string.
+let obj = {routeName: 'mainActivity', routeParams: {data: ''}};
+let obj1 = {routeName: 'Second Route', routeParams: {data: ''}};
+
+// Creating a foreground service.
 let notificationConfig = {
-  id: 434,
-  title: 'SuperService',
-  message: `I hope you are doing your `,
-  vibration: false,
-  visibility: 'public',
-  icon: 'ic_launcher',
-  importance: 'max',
-  number: String(1),
-  button: false,
-  buttonText: 'Checking why are you repeating your self',
-  buttonOnPress :    JSON.stringify(obj),
-  mainOnPress :    JSON.stringify(obj1)
+  id: 434, // unique id of the notification,
+  title: 'SuperService', //title of the notification
+  message: `I hope you are doing your `, // message in the notification
+  vibration: false, // vibration
+  visibility: 'public', // visibility, you can learn about theme on google official notification docs
+  icon: 'ic_launcher', // make sure you have ic_launcher
+  importance: 'max', // importance
+  number: String(1), // int specified as string > 0, for devices that support it, this might be used to set the badge counter
+  button: true, // if false there will be no button in the notification
+  buttonText: 'Checking why are you repeating your self', // text of the button in the foreground service notification
+  buttonOnPress: JSON.stringify(obj), // sending strings on click on main notification, you will receive them on device emitter
+  mainOnPress: JSON.stringify(obj1), // sensing strings on click on notification, you will receive them on device emitter
 };
 
-const a = async check => {
+// Minimal example to start up the foreground service
+const a = async (check) => {
   await ForegroundService.startService(notificationConfig);
 
   await ForegroundService.runTask({
-    taskName: 'myTaskName',
+    taskName: 'myTaskName', // name of the task. same as provided in the root file
     delay: 0,
-    loopDelay : 5000,
-    onLoop: true,
+    loopDelay: 5000, // interval of the loop
+    onLoop: true, // recurring calls to the headless task, on loop handles by java to run the in certain interval.
   });
 };
-const App: () => React$Node = () => {
+const App = () => {
   useEffect(() => {
-    
-  let subscip =   DeviceEventEmitter.addListener('notificationClickHandle', function(e : Event) {
-      console.log("json" ,JSON.parse(e.main));
-    });
-    return function cleanup() { subscip.remove()}
-  },[]);
+    // device event emitter used to
+    let subscip = DeviceEventEmitter.addListener(
+      'notificationClickHandle',
+      function (e) {
+        console.log('json', e);
+      },
+    );
+    return function cleanup() {
+      subscip.remove();
+    };
+  }, []);
 
-  const [isrunning, setrunning] = useState(false);
-  const check = async () => {
-    (await ForegroundService.isRunning())
-      ? setrunning(true)
-      : setrunning(false);
-  };
   return (
     <>
       <StatusBar barStyle="dark-content" />
       <SafeAreaView
         style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <Text>{'is running : ' + isrunning}</Text>
-        <Button title={'refresh'} onPress={() => check()} />
+        <Text>An Example for React Native Foreground Service. </Text>
         <Button title={'Start'} onPress={() => a()} />
         <Button
           title={'Stop'}
