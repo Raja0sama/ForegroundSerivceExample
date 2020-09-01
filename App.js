@@ -1,131 +1,80 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow strict-local
- */
+import React, {useEffect} from 'react';
+import {SafeAreaView, StyleSheet, Text, StatusBar, Button} from 'react-native';
 
-import React, {useState, useEffect} from 'react';
-import {
-  SafeAreaView,
-  StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  StatusBar,
-  Button,
-} from 'react-native';
-
-import {
-  Header,
-  LearnMoreLinks,
-  Colors,
-  DebugInstructions,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {DeviceEventEmitter} from 'react-native';
+import ReactNativeForegroundService from '@supersami/react-native-foreground-service';
 // importing Service to call
-import ForegroundService from '@supersami/react-native-foreground-service';
 
-// on button click or click on the main activity you will going to receive this as string.
-let obj = {routeName: 'mainActivity', routeParams: {data: ''}};
-let obj1 = {routeName: 'Second Route', routeParams: {data: ''}};
-
-// Creating a foreground service.
-let notificationConfig = {
-  id: 434, // unique id of the notification,
-  title: 'SuperService', //title of the notification
-  message: `I hope you are doing your `, // message in the notification
-  vibration: false, // vibration
-  visibility: 'public', // visibility, you can learn about theme on google official notification docs
-  icon: 'ic_launcher', // make sure you have ic_launcher
-  importance: 'max', // importance
-  number: String(1), // int specified as string > 0, for devices that support it, this might be used to set the badge counter
-  button: true, // if false there will be no button in the notification
-  buttonText: 'Checking why are you repeating your self', // text of the button in the foreground service notification
-  buttonOnPress: JSON.stringify(obj), // sending strings on click on main notification, you will receive them on device emitter
-  mainOnPress: JSON.stringify(obj1), // sensing strings on click on notification, you will receive them on device emitter
-};
-
-// Minimal example to start up the foreground service
-const a = async (check) => {
-  await ForegroundService.startService(notificationConfig);
-
-  await ForegroundService.runTask({
-    taskName: 'myTaskName', // name of the task. same as provided in the root file
-    delay: 0,
-    loopDelay: 5000, // interval of the loop
-    onLoop: true, // recurring calls to the headless task, on loop handles by java to run the in certain interval.
-  });
-};
 const App = () => {
+  // NOTIFICATION PARAMETERS : these are the parameters we have to start a foreground service , * indicate Required.
+  // id, * // Id of the notification must be a int
+  // title // title of the notification
+  // message  // message inside of the notification
+  // vibration
+  // visibility  ,
+  // icon // if you want to use custom icons, you can just use theme by giving their name without extension, make sure they are drawable. for eg = ic_launcher,
+  // largeicon // if you want to use custom icons, you can just use theme by giving their name without extension, make sure they are drawable. for eg = ic_launcher,
+  // importance // importance, you can read about it on google's official notification docs
+  // number // importance, you can read about it on google's official notification docs
+  // button // want a button in the notification, set it true
+  // buttonText // the text of the button.
+  // buttonOnPress // onPress Button, set a string here, onClick your app will reopen with that string in device emitter
+  // mainOnPress  // onPress Main Notification, set a string here, onClick your app will reopen with that string in device emitter
+
   useEffect(() => {
     // device event emitter used to
-    let subscip = DeviceEventEmitter.addListener(
+    let subscription = DeviceEventEmitter.addListener(
       'notificationClickHandle',
       function (e) {
         console.log('json', e);
       },
     );
     return function cleanup() {
-      subscip.remove();
+      subscription.remove();
     };
   }, []);
 
+  const onStart = () => {
+    // Checking if the task i am going to create already exist and running, which means that the foreground is also running.
+    if (ReactNativeForegroundService.is_task_running('taskid')) return;
+    // Creating a task.
+    ReactNativeForegroundService.add_task(
+      () => console.log('I am Being Tested'),
+      {
+        delay: 100,
+        onLoop: true,
+        taskId: 'taskid',
+        onError: (e) => console.log(`Error logging:`, e),
+      },
+    );
+    // starting  foreground service.
+    return ReactNativeForegroundService.start({
+      id: 144,
+      title: 'Foreground Service',
+      message: 'you are online!',
+    });
+  };
+
+  const onStop = () => {
+    // Make always sure to remove the task before stoping the service. and instead of re-adding the task you can always update the task.
+    if (ReactNativeForegroundService.is_task_running('taskid')) {
+      ReactNativeForegroundService.remove_task('taskid');
+    }
+    // Stoping Foreground service.
+    return ReactNativeForegroundService.stop();
+  };
   return (
     <>
       <StatusBar barStyle="dark-content" />
       <SafeAreaView
         style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
         <Text>An Example for React Native Foreground Service. </Text>
-        <Button title={'Start'} onPress={() => a()} />
-        <Button
-          title={'Stop'}
-          onPress={async () => await ForegroundService.stopService()}
-        />
+        <Button title={'Start'} onPress={onStart} />
+        <Button title={'Stop'} onPress={onStop} />
       </SafeAreaView>
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: Colors.lighter,
-  },
-  engine: {
-    position: 'absolute',
-    right: 0,
-  },
-  body: {
-    backgroundColor: Colors.white,
-  },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.black,
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-  footer: {
-    color: Colors.dark,
-    fontSize: 12,
-    fontWeight: '600',
-    padding: 4,
-    paddingRight: 12,
-    textAlign: 'right',
-  },
-});
 
 export default App;
