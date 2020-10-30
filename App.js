@@ -3,7 +3,7 @@ import {SafeAreaView, StyleSheet, Text, StatusBar, Button} from 'react-native';
 
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {DeviceEventEmitter} from 'react-native';
-import ReactNativeForegroundService from '@supersami/react-native-foreground-service';
+import ReactNativeForegroundService from '@supersami/rn-foreground-service';
 // importing Service to call
 
 const App = () => {

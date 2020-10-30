@@ -1066,10 +1066,10 @@
   dependencies:
     type-detect "4.0.8"
 
-"@supersami/react-native-foreground-service@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@supersami/react-native-foreground-service/-/react-native-foreground-service-0.1.0.tgz#4b32a0ba657a1ee8541b7e09f61cf07305085e2e"
-  integrity sha512-I9Ef01LbzpY+x/uPIYZZ5Ws4YxMBJQe6APOj6oXZb+HEHcsGMdz5IMbtVP34OXtaSH7cmm9Aam4qYbUKNQjJIw==
+"@supersami/rn-foreground-service@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@supersami/rn-foreground-service/-/rn-foreground-service-1.0.1.tgz#c9a024e4fe977931451d72f0417a4362c33d59f1"
+  integrity sha512-Kh0v8IunXw8KGXpcX9q/UwrxGDk5AmyGm8TfcoCDYwfNMswM9iRKdDABKsHXu9I/n3iZRMtSkO5KZAqJYqS3DQ==
 
 "@types/babel__core@^7.1.0":
   version "7.1.6"
